@@ -1,0 +1,54 @@
+#!/bin/sh
+
+#delete additional TK samples from file
+vcftools --remove sample_exclude2.txt --vcf cardio.annovar.csv.hg38_multianno.normalized.vcf --recode --out cardio.annovar.csv.hg38_only.vcf
+
+#recode vcf file to 0/1 format for genotypes
+cat cardio.annovar.csv.hg38_only.vcf.recode.vcf| perl -pe 'if(!m/^#/){s/:\S+//g}' >cardio.annovar.csv.hg38_only.vcf.recode01.vcf
+
+# make ped file with plink 
+plink --vcf cardio.annovar.csv.hg38_only.vcf.recode01.vcf --recode --out gwa.pulmo
+
+
+# make binary file from ped
+plink --file gwa.pulmo --make-bed --out gwa.pulmo.binary
+
+# recode file as cases
+cat gwa.pulmo.binary.fam | awk '{print $1, $2, "2"}' > gwa.pulmo.phenotype.txt 
+plink --bfile gwa.pulmo.binary --pheno gwa.pulmo.phenotype.txt --make-bed --out gwa.pulmo.binary.pheno
+
+# make binary file from gnomad vcf
+
+#recode gnomad .fam file as controls
+cat gnomad.v3.binary.fam | awk '{print $1, $2, "1"}' > gnomad.v3.phenotype.txt
+plink --bfile gnomad.v3.binary --pheno gnomad.v3.phenotype.txt --make-bed --out gnomad.v3.binary.pheno
+
+# Check individual heterozygosity rate
+plink --bfile gwa.pulmo.binary.pheno --het --out pulmo
+
+# Merge case and controls
+plink --bfile gwa.pulmo.binary.pheno --bmerge gnomad.v3.binary.pheno --make-bed --out pulmo.flips
+
+# remove duplicated variants
+cut -f 2 gwa.pulmo.binary.pheno.bim |sort| uniq -d > 2.dups
+plink --bfile gwa.pulmo.binary.pheno --exclude 2.dups --make-bed --out gwa.pulmo.binary.pheno_dedup
+
+# exclude variants 
+plink --bfile gnomad.v3.binary.pheno --exclude pulmo.flips-merge.missnp --make-bed --out gnomad.v3.binary_Aligned
+plink --bfile gwa.pulmo.binary.pheno_dedup --exclude pulmo.flips-merge.missnp --make-bed --out gwa.pulmo.binary_Aligned
+
+# Merge again
+plink --bfile gwa.pulmo.binary_Aligned --bmerge gnomad.v3.binary_Aligned --make-bed --allow-no-sex --out pulmo.1000G
+
+# Generate pairwise IBS estimates
+plink --bfile pulmo.1000G --genome --out IBS_pulmo
+
+#Perform PCA
+plink --bfile pulmo.1000G --read-genome IBS_pulmo.genome --cluster --pca --allow-no-sex --out pulmo_pca
+
+# Ascocciation study
+plink --bfile pulmo.1000G --assoc --ci 0.95 --allow-no-sex --out pulmo_new
+
+
+
+ 

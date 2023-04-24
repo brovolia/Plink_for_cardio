@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33122.133
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "vcf_recode", "vcf_recode.pyproj", "{E55F9ED7-5BB6-416E-B0D3-0F58DDC28E98}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E55F9ED7-5BB6-416E-B0D3-0F58DDC28E98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E55F9ED7-5BB6-416E-B0D3-0F58DDC28E98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {00877E27-6B9F-4C09-B5A5-3773BD60B6E9}
+	EndGlobalSection
+EndGlobal

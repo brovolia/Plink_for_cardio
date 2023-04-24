@@ -1,0 +1,10 @@
+#!/bin/sh
+
+#get bed coordinates for list of recomended genes via USCS https://genome-euro.ucsc.edu/cgi-bin/hgTables
+
+# use vcftools to retrieve vcf for this list of genes
+vcftools --vcf cardio.annovar.csv.hg38_only.vcf --bed recomend_genes --out rec_genes --recode --keep-INFO-all
+
+#use gatk to parse info field
+gatk VariantsToTable -V rec_genes.recode.vcf -F CHROM -F POS -F ID -F ANN -
+F REF -F ALT -F QUAL -F AC -F AF -F DP -F CAT -F Xref.refGene -F ExAC_NFE -F gnomAD_genome_NFE -F MutationTaster_pred -F FATHMM_score -F SIFT_score -GF AD -O rec_genes_delim
